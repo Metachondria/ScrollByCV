@@ -1,0 +1,1 @@
+ScrollCV is a project that implements page scrolling (currently only down) using the index finger gestures. The project utilizes CV(mediapipe) to track finger movements, allowing scrolling without using a mouse.

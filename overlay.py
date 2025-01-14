@@ -19,14 +19,14 @@ class Overlay:
 
     def draw_dot(self, x, y):
         self.canvas.delete("all")
-        self.canvas.create_oval(
-            x - self.dot_radius,
-            y - self.dot_radius,
-            x + self.dot_radius,
-            y + self.dot_radius,
-            fill="red",
-            outline=""
-        )
+        # self.canvas.create_oval(
+        #     x - self.dot_radius,
+        #     y - self.dot_radius,
+        #     x + self.dot_radius,
+        #     y + self.dot_radius,
+        #     fill="red",
+        #     outline=""
+        # )
         self.root.update()
 
     def update_position(self, x, y):

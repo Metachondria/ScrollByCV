@@ -1,9 +1,8 @@
-# main.py
-
 import cv2
 from hand_tracker import HandTracker
 from overlay import Overlay
 import pyautogui
+import numpy as np
 
 def map_finger_to_screen(finger_point, frame_width, frame_height, screen_width, screen_height):
     if finger_point is None:
@@ -25,6 +24,12 @@ def main():
 
     screen_width, screen_height = pyautogui.size()
 
+    # Для отслеживания предыдущей вертикальной позиции пальца и скорости прокрутки
+    last_y_position = None
+    last_scroll_time = 0  # Время последней прокрутки
+    scroll_sensitivity = 10  # Чувствительность прокрутки (больше значение = более чувствительная прокрутка)
+    scroll_speed = 100  # Степень прокрутки (больше значение = более быстрая прокрутка)
+
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -33,14 +38,10 @@ def main():
 
         frame = cv2.flip(frame, 1)
 
-        finger_point = hand_tracker.get_finger_tip_position(frame)
+        finger_point, _ = hand_tracker.get_finger_tip_position(frame)
 
         if finger_point:
             cv2.circle(frame, finger_point, 10, (0, 0, 255), -1)
-
-        cv2.imshow('Finger Tracking', frame)
-
-        #code for displaying a point on the screen
         if finger_point:
             frame_height, frame_width, _ = frame.shape
             screen_coords = map_finger_to_screen(finger_point, frame_width, frame_height, screen_width, screen_height)
@@ -48,10 +49,22 @@ def main():
                 screen_x, screen_y = screen_coords
                 overlay.update_position(screen_x, screen_y)
 
-        # exit
+                if last_y_position is not None:
+                    delta_y = finger_point[1] - last_y_position
+
+                    if abs(delta_y) > scroll_sensitivity:
+                        # NEED FIX
+                        if delta_y < 0:
+                            pyautogui.scroll(-110)  # SCROLL DOWN
+                        # elif delta_y > 0:
+                        #     pyautogui.scroll(0)  # Прокрутка вниз
+
+                last_y_position = finger_point[1]
+
+        cv2.imshow('Finger Tracking', frame)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
 
     cap.release()
     cv2.destroyAllWindows()
